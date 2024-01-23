@@ -1,10 +1,10 @@
 GNU_CC = g++
 LLVM_CC = armclang++
-CFLAGS = -g3 -Wall -mcpu=native -O2 -fopenmp 
+CFLAGS = -g3 -Wall -mcpu=native -O3 -fopenmp -lamath 
 LLVMOPT = -armpl=parallel
 GNUOPT = -larmpl_lp64_mp
 
-SRC_FILES = ../src/RiemannSiegel.cpp
+SRC_FILES = ../src/RiemannSiegel_OMP.cpp
 
 all: GNU_RiemannSiegel_OMP CLANG_RiemannSiegel_OMP
 
