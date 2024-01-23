@@ -405,7 +405,7 @@ int main(int argc,char **argv)
                         if(   ((zout<0.0)and(prev>0.0))
                                 or((zout>0.0)and(prev<0.0))){
                                 //printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-																#pragma omp atomic
+				#pragma omp atomic
                                 count++;
 			}
 			prev=zout;

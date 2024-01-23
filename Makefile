@@ -6,12 +6,12 @@ GNUOPT = -larmpl_lp64_mp
 
 SRC_FILES = ../src/RiemannSiegel.cpp
 
-all: GNU_RiemannSiegel CLANG_RiemannSiegel
+all: GNU_RiemannSiegel_OMP CLANG_RiemannSiegel_OMP
 
-GNU_RiemannSiegel: GNU_RiemannSiegel.o
+GNU_RiemannSiegel_OMP: GNU_RiemannSiegel.o
 	$(GNU_CC) -o $@ $^ $(CFLAGS)
 
-CLANG_RiemannSiegel: CLANG_RiemannSiegel.o
+CLANG_RiemannSiegel_OMP: CLANG_RiemannSiegel.o
 	$(LLVM_CC) -o $@ $^ $(CFLAGS)
 
 GNU_RiemannSiegel.o: $(SRC_FILES)
