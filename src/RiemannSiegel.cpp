@@ -62,7 +62,6 @@ Compute time 1 year-core so an algortihm 10000*2*40 times more efficient than Ze
 * *
 *************************************************************************/
 
-
 typedef unsigned long      ui32;
 typedef unsigned long long ui64;
 
@@ -74,11 +73,14 @@ double dml_micros()
         return((tv.tv_sec*1000000.0)+tv.tv_usec);
 }
 
+#define even(n) ( (n) % 2 ? -1 : 1 )
+/*
 int even(int n)
 {
 	if (n%2 == 0) return(1);
 	else          return(-1);
 }
+*/
 
 double theta(double t)
 {
@@ -112,7 +114,7 @@ double C(int n, double z){
 				-.00000143272516309551 * paw16*paw2			// pow(z,18.0)
 				-.00000010354847112313 * paw16*paw4			// pow(z,20.0)
 				+.00000001235792708386 * paw16*paw6			// pow(z,22.0)
-				+.00000000178810838580 * paw24			// pow(z,24.0)
+				+.00000000178810838580 * paw24				// pow(z,24.0)
 				-.00000000003391414390 * paw24*paw2			// pow(z,26.0)
 				-.00000000001632663390 * paw24*paw4			// pow(z,28.0)
 				-.00000000000037851093 * paw24*paw6			// pow(z,30.0)
@@ -121,7 +123,7 @@ double C(int n, double z){
 				-.00000000000000033507 * paw32*paw4			// pow(z,36.0)
 				-.00000000000000003412 * paw32*paw6			// pow(z,38.0)
 				+.00000000000000000058 * paw40				// pow(z,40.0)
-				+.00000000000000000015 * paw40*paw2	);		// pow(z,42.0));
+				+.00000000000000000015 * paw40*paw2 );		// pow(z,42.0));
 	}
 	else if (n==1) {
 		 return(-.02682510262837534703 * z					// pow(z, 1.0)
@@ -400,6 +402,3 @@ int main(int argc,char **argv)
 	printf("I found %1.0lf Zeros in %.3lf seconds\n",count,(t2-t1)/1000000.0);
 	return(0);
 }
-
-
-
