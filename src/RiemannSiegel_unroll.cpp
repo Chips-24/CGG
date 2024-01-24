@@ -260,7 +260,7 @@ double Z(double t, int n)
 	} 
 	ZZ = 2.0 * ZZ; 
 	double R  = 0.0; 
-	
+
 	/*
 	for (int k=0;k <= n;k++) {
 		R = R + C(k,2.0*p-1.0) * pow(2.0*PI/t, ((double) k)*0.5);
@@ -275,9 +275,7 @@ double Z(double t, int n)
 	R += C(2,tmp) * two_pi/t;
 	R += C(3,tmp) * (two_pi/t) * pow_half;
 	R += C(4,tmp) * two_pi/t * two_pi/t;
-
 	R = even(N-1) * pow(two_pi / t,0.25) * R; 
-	
 	return(ZZ + R);
 }
 
