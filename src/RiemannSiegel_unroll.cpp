@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <armpl.h>
 #include <math.h>
 #include <sys/time.h>
 #include <iostream>
@@ -10,7 +9,6 @@
 #include <vector>
 #include <cassert>
 
-#define PI 3.1415926535897932385
 /*************************************************************************
 * *
 
@@ -75,7 +73,8 @@ double dml_micros()
         return((tv.tv_sec*1000000.0)+tv.tv_usec);
 }
 
-#define even(n) ( (n) % 2 ? -1 : 1 )
+#define even(n) ( 1-2*((n)&1) )
+// #define even(n) ( (n) % 2 ? -1 : 1 )
 /*
 int even(int n)
 {
@@ -86,7 +85,15 @@ int even(int n)
 
 double theta(double t)
 {
-	return(t/2.0*log(t/2.0/PI) - t/2.0 - PI/8.0 + 1.0/48.0/t + 7.0/5760.0/pow(t,3.0) + 31.0/80640.0/powl(t,5.0) +127.0/430080.0/powl(t,7.0)+511.0/1216512.0/powl(t,9.0));
+	const double pi = 3.1415926535897932385;
+	long double pawt2 	= t*t;
+	long double pawt3 	= pawt2*t;
+	long double pawt5 	= pawt3*pawt2;
+	long double pawt7 	= pawt5*pawt2;
+	long double pawt9 	= pawt7*pawt2;
+	// Chanhe div by mul
+	// return(t/2.0*log(t/2.0/pi) - t/2.0 - pi/8.0   + 1.0/48.0/t + 7.0/5760.0/pow(t,3.0) + 31.0/80640.0/powl(t,5.0) +127.0/430080.0/powl(t,7.0)+511.0/1216512.0/powl(t,9.0));
+	return(   t*0.5*log(t*0.5/pi) - t*0.5 - pi*0.125 + 1.0/48.0/t + 7.0/5760.0/pawt3      + 31.0/80640.0/pawt5       +127.0/430080.0/pawt7      +511.0/1216512.0/pawt9      );
 	//https://oeis.org/A282898  // numerators
 	//https://oeis.org/A114721  // denominators
 }
@@ -239,15 +246,17 @@ double Z(double t, int n)
 //*************************************************************************
 {
 	double p; /* fractional part of sqrt(t/(2.0*pi))*/
-	double C(int,double); /* coefficient of (2*pi/t)^(k*0.5) */
-	int N = sqrt(t/(2.0 * PI)); 
-	p = sqrt(t/(2.0 * PI)) - N; 
+	// double C(int,double); /* coefficient of (2*pi/t)^(k*0.5) */  inutile ?
+	constexpr double pi = 3.1415926535897932385; 
+	constexpr double two_pi = 2.0 * pi; // precompute 2.0 * pi
+	double temp = sqrt(t/(two_pi));
+	int N = (int)temp; 
+		p = temp - N; 
 	double tt = theta(t); 
 	double ZZ = 0.0; 
-	
 	for (int j=1;j <= N;j++) {
-		// 1/sqrt remplacé par rsqrt
-		ZZ = ZZ + 1.0/sqrt((double) j ) * cos(fmod(tt -t*log((double) j),2.0*PI));
+		// 1/sqrt remplacé par rsqrt ?
+		ZZ = ZZ + 1.0/sqrt((double) j ) * cos(fmod(tt -t*log((double) j),two_pi));
 	} 
 	ZZ = 2.0 * ZZ; 
 	double R  = 0.0; 
@@ -258,14 +267,17 @@ double Z(double t, int n)
 	} 
 	*/
 	// Unroll
-	R += C(0,2.0*p-1.0) * pow(2.0*PI/t, ((double) 0)*0.5);
-	R += C(1,2.0*p-1.0) * pow(2.0*PI/t, ((double) 1)*0.5);
-	R += C(2,2.0*p-1.0) * pow(2.0*PI/t, ((double) 2)*0.5);
-	R += C(3,2.0*p-1.0) * pow(2.0*PI/t, ((double) 3)*0.5);
-	R += C(4,2.0*p-1.0) * pow(2.0*PI/t, ((double) 4)*0.5);
+	const double pow_0 = 1;
+	const double pow_half = pow(two_pi/t, ((double) 1)*0.5);
+	const double tmp = 2.0*p-1.0;
+	R += C(0,tmp) * pow_0;
+	R += C(1,tmp) * pow_half;
+	R += C(2,tmp) * two_pi/t;
+	R += C(3,tmp) * (two_pi/t) * pow_half;
+	R += C(4,tmp) * two_pi/t * two_pi/t;
 
-
-	R = even(N-1) * pow(2.0 * PI / t,0.25) * R; 
+	R = even(N-1) * pow(two_pi / t,0.25) * R; 
+	
 	return(ZZ + R);
 }
 
@@ -380,6 +392,7 @@ void test_fileof_zeros(const char *fname)
 int main(int argc,char **argv) 
 {
 	double LOWER,UPPER,SAMP;
+	const double pi = 3.1415926535897932385;
 	//tests_zeros();
 	//test_fileof_zeros("ZEROS");
 	try {
@@ -391,7 +404,7 @@ int main(int argc,char **argv)
 				std::cout << argv[0] << " START END SAMPLING" << std::endl;
 				return -1;
 	}
-	double estimate_zeros=theta(UPPER)/PI;
+	double estimate_zeros=theta(UPPER)/pi;
 	printf("I estimate I will find %1.3lf zeros\n",estimate_zeros);
 
 	double STEP = 1.0/SAMP;
@@ -400,14 +413,14 @@ int main(int argc,char **argv)
 	double count=0.0;
 	double t1 = dml_micros();
 
-	for (double t=LOWER;t<=UPPER;t+=STEP){
+	prev=Z(LOWER,4);
+
+	for (double t=LOWER+STEP;t<=UPPER;t+=STEP){
 		double zout=Z(t,4);
-		if(t>LOWER){
-			if(   ((zout<0.0)and(prev>0.0))
-				or((zout>0.0)and(prev<0.0))){
-				//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-				count++;
-			}
+		if(   ((zout<0.0)and(prev>0.0))
+			or((zout>0.0)and(prev<0.0))){
+			//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
+			count++;
 		}
 		prev=zout;
 	}
