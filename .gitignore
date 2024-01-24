@@ -3,5 +3,7 @@ output/
 .cache/
 .clangd/
 .vscode/
-
+test*
+run
+even.cpp
 

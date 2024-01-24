@@ -8,7 +8,7 @@ cmake --build build/
 ./build/RiemannSiegel 10 1000 100
 ```
 
-Pour alncer un programme vite fait avec slurm :
+Pour lancer un programme vite fait avec slurm :
 ```
 ./quick.sbatch <prog> [args ...]
 ```
