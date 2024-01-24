@@ -7,27 +7,32 @@ if [ "$#" -ne 6 ]; then
     exit 1
 fi
 
-output_dir="output"
+# Mesurement id
+mesurement_id=$1
+
+output_dir="output/$mesurement_id"
 if [[ ! -d "$output_dir" ]]; then
     # If it doesn't exist, create it
     mkdir -p "$output_dir"
 fi
 
-# Mesurement id
-mesurement_id=$1
-
 # Number of times the program will be executed
 reps=$2
 
 # Program to execute
-prog=./$3
+prog_path=$3
+prog=./$prog_path
 
 # Program arguments
 args="$4 $5 $6"
 
 # Output file
-output_file="$output_dir/$mesurement_id$(basename $3).out"
-echo "" > $output_file
+output_file="$output_dir/$(echo "$prog_path" | tr '/' '_').out"
+
+# Remove the output file if it exists
+if [[ -f "$output_file" ]]; then
+    rm "$output_file"
+fi
 
 total_time=0.0
 
@@ -46,7 +51,7 @@ done
 # Calculate the average time
 average_time=$(awk "BEGIN {print $total_time / $reps}")
 
-echo "$average_time $(basename $3) $args" >> $output_dir/$mesurement_id.times.out
+echo "$average_time $prog_path $args" >> $output_dir/times.out
 
-echo "Average time for $2 : $average_time seconds"
+echo "Average time for $3 : $average_time seconds"
 

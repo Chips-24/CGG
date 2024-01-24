@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=speedup_calculation
-#SBATCH --output=results.log
-#SBATCH --error=errors.log
+#SBATCH --job-name=compare
+#SBATCH --output=slurm/slurm-%j.out
+#SBATCH --error=slurm/slurm-%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 
@@ -9,14 +9,19 @@
 # (replace these lines with your specific requirements)
 
 # Move to the directory where your script is located
-if [ -n "$SLURM_YOUR_SCRIPT_DIR" ]; then
-    cd "$SLURM_YOUR_SCRIPT_DIR"
+if [ -n "$SLURM_SUBMIT_DIR" ]; then
+    cd "$SLURM_SUBMIT_DIR"
 else
-    echo "Error: SLURM_YOUR_SCRIPT_DIR is not set."
+    echo "Error: SLURM_SUBMIT_DIR is not set."
+fi
+
+if [[ ! -d "slurm" ]]; then
+    # If it doesn't exist, create it
+    mkdir -p "slurm"
 fi
 
 if [ "$#" -ne 7 ]; then
-    echo "usage ./speedup.sbatch <mesurement_id> <repetitions> <old_program> <new_program> <lower_bound> <upper_bound> <step> "
+    echo "usage ./compare.sbatch <mesurement_id> <repetitions> <old_program> <new_program> <lower_bound> <upper_bound> <step> "
     exit 1
 fi
 

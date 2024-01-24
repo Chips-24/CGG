@@ -12,13 +12,13 @@ id=$1
 # Input directory
 if [[ "$#" -lt 2 ]]; then
     # If no input directory is specified, use the default one
-    input_dir="output"
+    input_dir="output/$id"
 else
     # Otherwise, use the specified one
     input_dir="$2"
 fi
 
-input_file="$input_dir/$id.times.out"
+input_file="$input_dir/times.out"
 read time1 time2 <<< "$(awk '{print $1}' $input_file | tr '\n' ' ')"
 read prog1 prog2 <<< "$(awk '{print $2}' $input_file | tr '\n' ' ')"
    
