@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <armpl.h>
-#include <arm_math.h>
 #include <math.h>
 #include <sys/time.h>
 #include <iostream>
