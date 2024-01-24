@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=perfReport
-#SBATCH --output=perfReport_%J.o
-#SBATCH --error=perfReport_%J.e
+#SBATCH --job-name=map_report
+#SBATCH --output=map_report_%J.o
+#SBATCH --error=map_report_%J.e
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
@@ -12,5 +12,5 @@ echo ${SLURM_SUBMIT_DIR}
 cd ${SLURM_SUBMIT_DIR}
 
 # Run your script
-map --profile -o "${SLURM_JOB_NAME}_${SLURM_JOB_ID}" ./"$@"
+map --profile -openmp-threads=1 -o "${SLURM_JOB_NAME}_${SLURM_JOB_ID}" ./"$@"
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <armpl.h>
 #include <math.h>
 #include <sys/time.h>
 #include <iostream>
@@ -8,6 +9,7 @@
 #include <complex>
 #include <vector>
 #include <cassert>
+#include <omp.h>
 
 /*************************************************************************
 * *
@@ -265,20 +267,17 @@ double Z(double t, int n)
 	for (int k=0;k <= n;k++) {
 		R = R + C(k,2.0*p-1.0) * pow(2.0*PI/t, ((double) k)*0.5);
 	} 
-	R = even(N-1) * pow(two_pi / t,0.25) * R; 
 	*/
 	// Unroll
 	const double pow_0 = 1;
-	const double two_pi_div_t = two_pi/t;
-	const double pow_half = pow(two_pi_div_t, 0.5);
+	const double pow_half = pow(two_pi/t, ((double) 1)*0.5);
 	const double tmp = 2.0*p-1.0;
 	R += C(0,tmp) * pow_0;
 	R += C(1,tmp) * pow_half;
-	R += C(2,tmp) * two_pi_div_t;
-	R += C(3,tmp) * (two_pi_div_t) * pow_half;
-	R += C(4,tmp) * two_pi_div_t * two_pi_div_t;
-
-	R = even(N-1) * pow(two_pi_div_t,0.25) * R; 
+	R += C(2,tmp) * two_pi/t;
+	R += C(3,tmp) * (two_pi/t) * pow_half;
+	R += C(4,tmp) * two_pi/t * two_pi/t;
+	R = even(N-1) * pow(two_pi / t,0.25) * R; 
 	return(ZZ + R);
 }
 
@@ -409,22 +408,37 @@ int main(int argc,char **argv)
 	printf("I estimate I will find %1.3lf zeros\n",estimate_zeros);
 
 	double STEP = 1.0/SAMP;
-	ui64   NUMSAMPLES=floor((UPPER-LOWER)*SAMP+1.0);
+	const ui64 NUMSAMPLES=floor((UPPER-LOWER)*SAMP+1.0);
 	double prev=0.0;
 	double count=0.0;
 	double t1 = dml_micros();
 
-	prev=Z(LOWER,4);
-
-	for (double t=LOWER+STEP;t<=UPPER;t+=STEP){
+	#pragma omp parallel for reduction(+:count) firstprivate(prev)
+	{
+		for (ui32 i=0; i<=NUMSAMPLES; i+=1){
+				double zout=Z(LOWER + i *STEP,4);
+      	if(   ((zout<0.0)and(prev>0.0))
+        	or((zout>0.0)and(prev<0.0))){
+            //printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
+            count++;
+				}
+				prev=zout;
+ 		}
+	}
+		/*
+	for (double t=LOWER;t<=UPPER;t+=STEP){
 		double zout=Z(t,4);
-		if(   ((zout<0.0)and(prev>0.0))
-			or((zout>0.0)and(prev<0.0))){
-			//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-			count++;
+		if(t>LOWER){
+			if(   ((zout<0.0)and(prev>0.0))
+				or((zout>0.0)and(prev<0.0))){
+				//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
+				count++;
+			}
 		}
 		prev=zout;
 	}
+	*/
+
 	double t2=dml_micros();
 
 	printf("I found %1.0lf Zeros in %.3lf seconds\n",count,(t2-t1)/1000000.0);

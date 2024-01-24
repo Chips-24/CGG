@@ -1,11 +1,11 @@
 # CGG
 
-Pour compiler
+Compilation
 
 ```
-cmake -S . -B build
-cmake --build build/
-./build/RiemannSiegel 10 1000 100
+make         // pour compiler tout les fichiers dans src/
+    ou
+make DEBUG=1 // pour avoir les symboles de debug (-g3)
 ```
 
 Pour lancer un programme vite fait avec slurm :
@@ -20,5 +20,6 @@ Pour comparer deux versions du programme :
 ./speedup.sh <id_mesurement> [output_dir]
 ```  
 Par défault les résultats sont dans `output/` et les sorties slurm dans `slurm/slurm-jobid.out` et `slurm/slurm-jobid.err`.  
-Chaque mesure (définit par son id) à son propre dossier dans `output/`
-Pensez à définir le chemin vers vos scripts pour slurm avec la variable d'environnement `SLURM_SUBMIT_DIR`
+Chaque mesure (définit par son id) à son propre dossier dans `output/`  
+
+Pensez à définir `SLURM_SUBMIT_DIR` pour indiquer le dossier contenant les scripts à éxécuter.
