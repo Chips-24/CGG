@@ -6,7 +6,12 @@ LLVM_CC = armclang++
 LLVMOPT = -armpl=parallel
 
 # Commons flags
-CFLAGS = -g3 -Wall -mcpu=native -O3 -fopenmp -lamath
+CFLAGS = -Wall -mcpu=native -O3 -fopenmp -lamath
+
+# Activate debug flags
+ifdef DEBUG
+	CFLAGS += -g3
+endif
 
 # Directories
 SRC=src

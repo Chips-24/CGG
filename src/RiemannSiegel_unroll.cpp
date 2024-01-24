@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <armpl.h>
+//#include <armpl.h>
 #include <math.h>
 #include <sys/time.h>
 #include <iostream>
@@ -266,17 +266,20 @@ double Z(double t, int n)
 	for (int k=0;k <= n;k++) {
 		R = R + C(k,2.0*p-1.0) * pow(2.0*PI/t, ((double) k)*0.5);
 	} 
+	R = even(N-1) * pow(two_pi / t,0.25) * R; 
 	*/
 	// Unroll
 	const double pow_0 = 1;
-	const double pow_half = pow(two_pi/t, ((double) 1)*0.5);
+	const double two_pi_div_t = two_pi/t;
+	const double pow_half = pow(two_pi_div_t, 0.5);
 	const double tmp = 2.0*p-1.0;
 	R += C(0,tmp) * pow_0;
 	R += C(1,tmp) * pow_half;
-	R += C(2,tmp) * two_pi/t;
-	R += C(3,tmp) * (two_pi/t) * pow_half;
-	R += C(4,tmp) * two_pi/t * two_pi/t;
-	R = even(N-1) * pow(two_pi / t,0.25) * R; 
+	R += C(2,tmp) * two_pi_div_t;
+	R += C(3,tmp) * (two_pi_div_t) * pow_half;
+	R += C(4,tmp) * two_pi_div_t * two_pi_div_t;
+
+	R = even(N-1) * pow(two_pi_div_t,0.25) * R; 
 	return(ZZ + R);
 }
 
