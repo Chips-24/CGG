@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=perfReport
-#SBATCH --output=perfReport_%J.o
-#SBATCH --error=perfReport_%J.e
+#SBATCH --job-name=map_report
+#SBATCH --output=map_report_%J.o
+#SBATCH --error=map_report_%J.e
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
