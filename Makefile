@@ -1,11 +1,18 @@
-CXX = g++
-CXXFLAGS = -Wall -O3 
+# Compiler informations
+GNU_CC = g++
+GNUOPT = -larmpl_lp64_mp
 
-# Valid flags : -DSILENT
-OPTFLAGS =
+LLVM_CC = armclang++
+LLVMOPT = -armpl=parallel
 
+# Commons flags
+CFLAGS = -g3 -Wall -mcpu=native -O3 -fopenmp -lamath
+
+# Directories
 SRC=src
 BIN=build
+BIN_GCC   = $(BIN)/gcc
+BIN_CLANG = $(BIN)/clang
 
 # Get a list of all .c files in the src directory
 SRCS = $(wildcard $(SRC)/*.cpp)
@@ -13,26 +20,24 @@ SRCS = $(wildcard $(SRC)/*.cpp)
 # Generate a list of corresponding binary names
 BINS = $(notdir $(basename $(SRCS)))
 
-all: $(BINS)
+all: gcc clang
+
+gcc:   $(addprefix $(BIN_GCC)/, $(BINS))
+
+clang: $(addprefix $(BIN_CLANG)/, $(BINS))
 
 # Rule to build each binary from its corresponding .cpp file
-%: $(SRC)/%.cpp | $(BIN)
-	$(CXX) $(CXXFLAGS) $(OPTFLAGS) -o $(BIN)/$@ $<
+$(BIN_GCC)/%: $(SRC)/%.cpp | $(BIN_GCC)
+	$(GNU_CC) $(CFLAGS) $(GNUOPT) $< -o $@
+
+$(BIN_CLANG)/%: $(SRC)/%.cpp | $(BIN_CLANG)
+	$(LLVM_CC) $(CFLAGS) $(LLVMOPT) $< -o $@
 
 # Rule to create the build directory
-$(BIN):
+$(BIN_GCC) $(BIN_CLANG):
 	mkdir -p $@
 
 clean:
 	rm -rf $(BIN)
 
 .PHONY: clean
-
-COMPFILES = RiemannSiegel
-COMPARGS = 10 10000 100 10
-# Compare rule
-compare: $(addprefix run_,$(COMPFILES))
-
-# Rule to run each binary
-run_%: $(BIN)/%
-	$(BIN)/$* $(COMPARGS)
