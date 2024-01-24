@@ -258,12 +258,15 @@ double Z(double t, int n)
 	} 
 	*/
 	// Unroll
-	R += C(0,2.0*p-1.0) * pow(2.0*PI/t, ((double) 0)*0.5);
-	R += C(1,2.0*p-1.0) * pow(2.0*PI/t, ((double) 1)*0.5);
-	R += C(2,2.0*p-1.0) * pow(2.0*PI/t, ((double) 2)*0.5);
-	R += C(3,2.0*p-1.0) * pow(2.0*PI/t, ((double) 3)*0.5);
-	R += C(4,2.0*p-1.0) * pow(2.0*PI/t, ((double) 4)*0.5);
-
+	const double pow_0 = 1;
+	const double pow_half = pow(two_pi/t, ((double) 1)*0.5);
+	const double tmp = 2.0*p-1.0;
+	R += C(0,tmp) * pow_0;
+	R += C(1,tmp) * pow_half;
+	R += C(2,tmp) * two_pi/t;
+	R += C(3,tmp) * (two_pi/t) * pow_half;
+	R += C(4,tmp) * two_pi/t * two_pi/t;
+	R = even(N-1) * pow(two_pi / t,0.25) * R; 
 
 	R = even(N-1) * pow(2.0 * PI / t,0.25) * R; 
 	return(ZZ + R);
