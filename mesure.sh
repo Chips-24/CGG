@@ -2,8 +2,8 @@
 
 # This script is used to mesure the time of the execution of a program
 
-if [ "$#" -ne 5 ]; then
-    echo "usage ./script.sh <repetitions> <program> <lower_bound> <upper_bound> <step> "
+if [ "$#" -ne 6 ]; then
+    echo "usage ./mesure.sh <mesurement_id> <repetitions> <program> <lower_bound> <upper_bound> <step> "
     exit 1
 fi
 
@@ -13,17 +13,20 @@ if [[ ! -d "$output_dir" ]]; then
     mkdir -p "$output_dir"
 fi
 
+# Mesurement id
+mesurement_id=$1
+
 # Number of times the program will be executed
-reps=$1
+reps=$2
 
 # Program to execute
-prog=./$2
+prog=./$3
 
 # Program arguments
-args="$3 $4 $5"
+args="$4 $5 $6"
 
 # Output file
-output_file="$output_dir/$(basename $2).out"
+output_file="$output_dir/$mesurement_id$(basename $3).out"
 echo "" > $output_file
 
 total_time=0.0
@@ -42,6 +45,8 @@ done
 
 # Calculate the average time
 average_time=$(awk "BEGIN {print $total_time / $reps}")
+
+echo "$average_time $(basename $3) $args" >> $output_dir/$mesurement_id.times.out
 
 echo "Average time for $2 : $average_time seconds"
 
