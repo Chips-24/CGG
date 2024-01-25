@@ -110,6 +110,7 @@ void compute_table(ui64 size)
 	{
 		invert_sqrt[k] = 1.0/sqrt(k);
 		log_int[k] = log(k);
+		//printf("%6d : %f \t %f\n", k,invert_sqrt[k],log_int[k]);
 	}
 }
 
@@ -503,12 +504,13 @@ int main(int argc,char **argv)
 	}
 	double estimate_zeros=theta(UPPER)/pi;
 	printf("I estimate I will find %1.3lf zeros\n",estimate_zeros);
-	compute_table(sqrt(UPPER/(2*pi))+1);
 	double STEP = 1.0/SAMP;
 	ui64   NUMSAMPLES=floor((UPPER-LOWER)*SAMP+1.0);
 	double prev=0.0;
 	double count=0.0;
 	double t1 = dml_micros();
+
+	compute_table(sqrt(UPPER/(2*pi))+1);
 
 	prev=Z(LOWER,4);
 

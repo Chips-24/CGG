@@ -107,7 +107,7 @@ void compute_table(ui64 size)
 {
 	invert_sqrt.reserve(size);
 	log_int.reserve(size);
-	#pragma omp parallel for
+	#pragma omp parallel for shared(invert_sqrt,log_int)
 	for (ui64 k = 1; k < size; k++)
 	{
 		invert_sqrt[k] = 1.0/sqrt(k);
@@ -505,14 +505,15 @@ int main(int argc,char **argv)
 	}
 	double estimate_zeros=theta(UPPER)/pi;
 	printf("I estimate I will find %1.3lf zeros\n",estimate_zeros);
-	compute_table(sqrt(UPPER/(2*pi))+1);
 	double STEP = 1.0/SAMP;
 	ui64   NUMSAMPLES=floor((UPPER-LOWER)*SAMP+1.0);
 	double prev=0.0;
 	double count=0.0;
 	double t1 = dml_micros();
+	
+	compute_table(sqrt(UPPER/(2*pi))+1);
 
-	#pragma omp parallel firstprivate(prev) reduction(+:count) 
+	#pragma omp parallel firstprivate(prev) reduction(+:count) shared(invert_sqrt,log_int) 
 	{
 		const ui32 nb_thread = omp_get_num_threads();
 		const ui32 th_id = omp_get_thread_num();

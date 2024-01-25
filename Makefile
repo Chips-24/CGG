@@ -1,6 +1,6 @@
 # Compiler informations
 GNU_CC = g++
-GNUOPT = -larmpl_lp64_mp
+GNUOPT = -larmpl_lp64_mp -ftree-vectorize
 
 LLVM_CC = armclang++
 LLVMOPT = -armpl=parallel -fsimdmath
