@@ -4,6 +4,9 @@
 #SBATCH --error=slurm/slurm-%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --export=ALL
+#SBATCH --exclusive
 
 # Load any necessary modules or set environment variables
 # (replace these lines with your specific requirements)

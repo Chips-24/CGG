@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=Rieman_OMP
-#SBATCH --output=Rieman_OMP_%J.o
-#SBATCH --error=Rieman_OMP_%J.e
+#SBATCH --job-name=quicktestOMP
+#SBATCH --output=slurm/testOMPout-%j.log
+#SBATCH --error=slurm/testOMPerr-%j.log
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

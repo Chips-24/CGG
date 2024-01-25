@@ -9,7 +9,6 @@
 #include <complex>
 #include <vector>
 #include <cassert>
-#include <omp.h>
 
 /*************************************************************************
 * *
@@ -100,7 +99,9 @@ double theta(double t)
 	//https://oeis.org/A114721  // denominators
 }
 
-
+/*
+ * Inlineing it as each if statement 
+ *
 double C(int n, double z){
 	double paw2 	= z*z;
 	double paw4 	= paw2*paw2;
@@ -240,6 +241,148 @@ double C(int n, double z){
 				+.00000000000000000004 * paw40*paw8 );		// pow(z,48.0));
 	}
 }
+*/
+#define paws(z) 	double paw2 	= z*z;			\
+					double paw4 	= paw2*paw2;	\
+					double paw6 	= paw4*paw2;	\
+					double paw8 	= paw4*paw4;	\
+					double paw16 	= paw8*paw8;	\
+					double paw24 	= paw16*paw8;	\
+					double paw32 	= paw16*paw16;	\
+					double paw40 	= paw32*paw8;   \
+                    double paw1     = z;            \
+                    double paw3     = paw2*z;       \
+                    double paw5     = paw4*z;       \
+                    double paw7     = paw6*z;       \
+                    double paw9     = paw8*z;       \
+                    double paw17    = paw16*z;      \
+                    double paw25    = paw24*z;      \
+                    double paw33    = paw32*z;      \
+                    double paw41    = paw40*z;      
+
+
+#define C0  (.38268343236508977173       			\
+			+.43724046807752044936 * paw2			\
+			+.13237657548034352332 * paw4			\
+			-.01360502604767418865 * paw6			\
+			-.01356762197010358089 * paw8			\
+			-.00162372532314446528 * paw8*paw2		\
+			+.00029705353733379691 * paw8*paw4		\
+			+.00007943300879521470 * paw8*paw6		\
+			+.00000046556124614505 * paw16			\
+			-.00000143272516309551 * paw16*paw2		\
+			-.00000010354847112313 * paw16*paw4		\
+			+.00000001235792708386 * paw16*paw6		\
+			+.00000000178810838580 * paw24			\
+			-.00000000003391414390 * paw24*paw2		\
+			-.00000000001632663390 * paw24*paw4		\
+			-.00000000000037851093 * paw24*paw6		\
+			+.00000000000009327423 * paw32			\
+			+.00000000000000522184 * paw32*paw2		\
+			-.00000000000000033507 * paw32*paw4		\
+			-.00000000000000003412 * paw32*paw6		\
+			+.00000000000000000058 * paw40			\
+			+.00000000000000000015 * paw40*paw2)
+
+#define C1 (-.02682510262837534703 * paw1			\
+			+.01378477342635185305 * paw3			\
+			+.03849125048223508223 * paw5			\
+			+.00987106629906207647 * paw7       	\
+			-.00331075976085840433 * paw9			\
+			-.00146478085779541508 * paw9*paw2	    \
+			-.00001320794062487696 * paw9*paw4  	\
+			+.00005922748701847141 * paw9*paw6  	\
+			+.00000598024258537345 * paw17		    \
+			-.00000096413224561698 * paw17*paw2 	\
+			-.00000018334733722714 * paw17*paw4 	\
+			+.00000000446708756272 * paw17*paw6 	\
+			+.00000000270963508218 * paw25		    \
+			+.00000000007785288654 * paw25*paw2 	\
+			-.00000000002343762601 * paw25*paw4 	\
+			-.00000000000158301728 * paw25*paw6 	\
+			+.00000000000012119942 * paw33  		\
+			+.00000000000001458378 * paw33*paw2 	\
+			-.00000000000000028786 * paw33*paw4 	\
+			-.00000000000000008663 * paw33*paw6 	\
+			-.00000000000000000084 * paw41      	\
+			+.00000000000000000036 * paw41*paw2 	\
+			+.00000000000000000001 * paw41*paw4 )
+
+#define C2 (+.00518854283029316849       			\
+			+.00030946583880634746 * paw2			\
+			-.01133594107822937338 * paw4			\
+			+.00223304574195814477 * paw6			\
+			+.00519663740886233021 * paw8			\
+			+.00034399144076208337 * paw8*paw2		\
+			-.00059106484274705828 * paw8*paw4		\
+			-.00010229972547935857 * paw8*paw6		\
+			+.00002088839221699276 * paw16			\
+			+.00000592766549309654 * paw16*paw2		\
+			-.00000016423838362436 * paw16*paw4		\
+			-.00000015161199700941 * paw16*paw6		\
+			-.00000000590780369821 * paw24			\
+			+.00000000209115148595 * paw24*paw2		\
+			+.00000000017815649583 * paw24*paw4		\
+			-.00000000001616407246 * paw24*paw6		\
+			-.00000000000238069625 * paw32			\
+			+.00000000000005398265 * paw32*paw2		\
+			+.00000000000001975014 * paw32*paw4		\
+			+.00000000000000023333 * paw32*paw6		\
+			-.00000000000000011188 * paw40			\
+			-.00000000000000000416 * paw40*paw2		\
+			+.00000000000000000044 * paw40*paw4		\
+			+.00000000000000000003 * paw40*paw6 )
+
+#define C3 (-.00133971609071945690 * paw1			\
+			+.00374421513637939370 * paw3			\
+			-.00133031789193214681 * paw5			\
+			-.00226546607654717871 * paw7       	\
+			+.00095484999985067304 * paw9			\
+			+.00060100384589636039 * paw9*paw2	    \
+			-.00010128858286776622 * paw9*paw4  	\
+			-.00006865733449299826 * paw9*paw6  	\
+			+.00000059853667915386 * paw17		    \
+			+.00000333165985123995 * paw17*paw2 	\
+			+.00000021919289102435 * paw17*paw4 	\
+			-.00000007890884245681 * paw17*paw6 	\
+			-.00000000941468508130 * paw25		    \
+			+.00000000095701162109 * paw25*paw2 	\
+			+.00000000018763137453 * paw25*paw4 	\
+			-.00000000000443783768 * paw25*paw6 	\
+			-.00000000000224267385 * paw33  		\
+			-.00000000000003627687 * paw33*paw2 	\
+			+.00000000000001763981 * paw33*paw4 	\
+			+.00000000000000079608 * paw33*paw6 	\
+			-.00000000000000009420 * paw41      	\
+			-.00000000000000000713 * paw41*paw2 	\
+			+.00000000000000000033 * paw41*paw4     \
+			+.00000000000000000004 * paw41*paw6 )
+
+#define C4 (+.00046483389361763382 					\
+			-.00100566073653404708 * paw2     		\
+			+.00024044856573725793 * paw4     		\
+			+.00102830861497023219 * paw6     		\
+			-.00076578610717556442 * paw8     		\
+			-.00020365286803084818 * paw8*paw2		\
+			+.00023212290491068728 * paw8*paw4		\
+			+.00003260214424386520 * paw8*paw6		\
+			-.00002557906251794953 * paw16     		\
+			-.00000410746443891574 * paw16*paw2		\
+			+.00000117811136403713 * paw16*paw4		\
+			+.00000024456561422485 * paw16*paw6		\
+			-.00000002391582476734 * paw24			\
+			-.00000000750521420704 * paw24*paw2		\
+			+.00000000013312279416 * paw24*paw4		\
+			+.00000000013440626754 * paw24*paw6		\
+			+.00000000000351377004 * paw32			\
+			-.00000000000151915445 * paw32*paw2		\
+			-.00000000000008915418 * paw32*paw4		\
+			+.00000000000001119589 * paw32*paw6		\
+			+.00000000000000105160 * paw40     		\
+			-.00000000000000005179 * paw40*paw2		\
+			-.00000000000000000807 * paw40*paw4		\
+			+.00000000000000000011 * paw40*paw6		\
+			+.00000000000000000004 * paw40*paw8 )
 
 double Z(double t, int n)
 //*************************************************************************
@@ -267,17 +410,24 @@ double Z(double t, int n)
 	for (int k=0;k <= n;k++) {
 		R = R + C(k,2.0*p-1.0) * pow(2.0*PI/t, ((double) k)*0.5);
 	} 
+	R = even(N-1) * pow(two_pi / t,0.25) * R; 
 	*/
 	// Unroll
 	const double pow_0 = 1;
-	const double pow_half = pow(two_pi/t, ((double) 1)*0.5);
+	const double two_pi_div_t = two_pi/t;
+	const double pow_half = pow(two_pi_div_t, 0.5);
 	const double tmp = 2.0*p-1.0;
-	R += C(0,tmp) * pow_0;
-	R += C(1,tmp) * pow_half;
-	R += C(2,tmp) * two_pi/t;
-	R += C(3,tmp) * (two_pi/t) * pow_half;
-	R += C(4,tmp) * two_pi/t * two_pi/t;
-	R = even(N-1) * pow(two_pi / t,0.25) * R; 
+
+	// Using #defined version of C() function
+	paws(tmp);	
+
+	R += C0 * pow_0;
+	R += C1 * pow_half;
+	R += C2 * two_pi_div_t;
+	R += C3 * (two_pi_div_t) * pow_half;
+	R += C4 * two_pi_div_t * two_pi_div_t;
+
+	R = even(N-1) * pow(two_pi_div_t,0.25) * R; 
 	return(ZZ + R);
 }
 
@@ -413,39 +563,17 @@ int main(int argc,char **argv)
 	double count=0.0;
 	double t1 = dml_micros();
 
-	#pragma omp parallel firstprivate(prev)
-	{
-		const ui32 nb_thread = omp_get_num_threads();
-		const ui32 th_id = omp_get_thread_num();
-		double THREAD_STEP = (UPPER-LOWER)/nb_thread;
-        	double THREAD_LOWER = (double)th_id*THREAD_STEP + LOWER;
-        	double THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + LOWER;
+	prev=Z(LOWER,4);
 
-		for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP){
-				double zout=Z(t,4);
-      	if(   ((zout<0.0)and(prev>0.0))
-        	or((zout>0.0)and(prev<0.0))){
-            //printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-						#pragma omp atomic
-            count++;
-				}
-				prev=zout;
- 		}
-	}
-		/*
-	for (double t=LOWER;t<=UPPER;t+=STEP){
+	for (double t=LOWER+STEP;t<=UPPER;t+=STEP){
 		double zout=Z(t,4);
-		if(t>LOWER){
-			if(   ((zout<0.0)and(prev>0.0))
-				or((zout>0.0)and(prev<0.0))){
-				//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-				count++;
-			}
+		if(   ((zout<0.0)and(prev>0.0))
+			or((zout>0.0)and(prev<0.0))){
+			//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
+			count++;
 		}
 		prev=zout;
 	}
-	*/
-
 	double t2=dml_micros();
 
 	printf("I found %1.0lf Zeros in %.3lf seconds\n",count,(t2-t1)/1000000.0);

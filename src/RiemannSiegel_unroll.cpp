@@ -37,7 +37,7 @@ Only a correct (right) count matters, and the performance.
 compile g++ RiemannSiegel.cpp -O -o RiemannSiegel
 --------------------------------------------------------------------------
 ./RiemannSiegel 10 1000 100
-I found 10142 Zeros in 3.459 seconds     # OK 
+I found 649 Zeros in 3.459 seconds     # OK 
 --------------------------------------------------------------------------
 ./RiemannSiegel 10 10000 10 
 I found 10142 Zeros in 0.376 seconds     # OK
