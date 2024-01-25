@@ -413,22 +413,17 @@ int main(int argc,char **argv)
 	double count=0.0;
 	double t1 = dml_micros();
 
-	#pragma omp parallel firstprivate(prev)
+	#pragma omp parallel firstprivate(prev) reduction(+:count) 
 	{
 		const ui32 nb_thread = omp_get_num_threads();
 		const ui32 th_id = omp_get_thread_num();
 		double THREAD_STEP = (UPPER-LOWER)/nb_thread;
-        	double THREAD_LOWER = (double)th_id*THREAD_STEP + LOWER;
-        	double THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + LOWER;
+    double THREAD_LOWER = (double)th_id*THREAD_STEP + LOWER;
+    double THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + LOWER;
 
 		for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP){
 				double zout=Z(t,4);
-      	if(   ((zout<0.0)and(prev>0.0))
-        	or((zout>0.0)and(prev<0.0))){
-            //printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-						#pragma omp atomic
-            count++;
-				}
+      	count +=  (signbit(zout) != signbit(prev));
 				prev=zout;
  		}
 	}
@@ -452,3 +447,5 @@ int main(int argc,char **argv)
 	
 	return(0);
 }
+
+
