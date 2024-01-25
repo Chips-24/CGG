@@ -67,6 +67,9 @@ Compute time 1 year-core so an algortihm 10000*2*40 times more efficient than Ze
 typedef unsigned long      ui32;
 typedef unsigned long long ui64;
 
+std::vector<double> invert_sqrt;
+std::vector<double> log_int;
+
 double dml_micros()
 {
         static struct timezone tz;
@@ -98,6 +101,18 @@ double theta(double t)
 	return(   t*0.5*log(t*0.5/pi) - t*0.5 - pi*0.125 + 1.0/48.0/t + 7.0/5760.0/pawt3      + 31.0/80640.0/pawt5       +127.0/430080.0/pawt7      +511.0/1216512.0/pawt9      );
 	//https://oeis.org/A282898  // numerators
 	//https://oeis.org/A114721  // denominators
+}
+
+void compute_table(ui64 size)
+{
+	invert_sqrt.reserve(size);
+	log_int.reserve(size);
+	#pragma omp parallel for
+	for (ui64 k = 1; k < size; k++)
+	{
+		invert_sqrt[k] = 1.0/sqrt(k);
+		log_int[k] = log(k);
+	}
 }
 
 /*
@@ -335,7 +350,7 @@ double Z(double t, int n)
 	double ZZ = 0.0; 
 	for (int j=1;j <= N;j++) {
 		// 1/sqrt remplacé par rsqrt ?
-		ZZ = ZZ + 1.0/sqrt((double) j ) * cos(fmod(tt -t*log((double) j),two_pi));
+		ZZ = ZZ + invert_sqrt[j] * cos(tt - t*log_int[j]);
 	} 
 	ZZ = 2.0 * ZZ; 
 	double R  = 0.0; 
@@ -490,7 +505,7 @@ int main(int argc,char **argv)
 	}
 	double estimate_zeros=theta(UPPER)/pi;
 	printf("I estimate I will find %1.3lf zeros\n",estimate_zeros);
-
+	compute_table(sqrt(UPPER/(2*pi))+1);
 	double STEP = 1.0/SAMP;
 	ui64   NUMSAMPLES=floor((UPPER-LOWER)*SAMP+1.0);
 	double prev=0.0;
@@ -541,6 +556,7 @@ int main(int argc,char **argv)
 	double t2=dml_micros();
 
 	printf("I found %1.0lf Zeros in %.3lf seconds\n",count,(t2-t1)/1000000.0);
-	
+	log_int.clear();
+	invert_sqrt.clear();
 	return(0);
 }
