@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <armpl.h>
 #include <math.h>
 #include <sys/time.h>
 #include <iostream>
@@ -422,10 +423,7 @@ int main(int argc,char **argv)
 
 		for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP){
 				double zout=Z(t,4);
-      	if( (zout * prev) <0.0 ){
-            //printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-						count++;
-				}
+      	count +=  (signbit(zout) != signbit(prev));
 				prev=zout;
  		}
 	}

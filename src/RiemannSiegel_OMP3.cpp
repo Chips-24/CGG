@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <armpl.h>
 #include <math.h>
 #include <sys/time.h>
 #include <iostream>
@@ -416,42 +417,39 @@ int main(int argc,char **argv)
 	{
 		const ui32 nb_thread = omp_get_num_threads();
 		const ui32 th_id = omp_get_thread_num();
-		const double TASK_STEP = (UPPER-LOWER)/(nb_thread*16);
+		double TASK_STEP = (UPPER-LOWER)/nb_thread;
 		double THREAD_STEP = (TASK_STEP)/nb_thread;
 		ui64 task_i = 0;
 		double TASK_LOWER = 0;
 		double TASK_UPPER = 0;
 		double THREAD_LOWER = 0;
 		double THREAD_UPPER = 0;
-		prev=0.0;
-		for(task_i = 0 ; TASK_UPPER <  UPPER - TASK_STEP; task_i++)
-		{
-			TASK_LOWER = TASK_STEP * task_i;
-			TASK_UPPER = TASK_STEP * (task_i + 1);
-			THREAD_LOWER = (double)th_id*THREAD_STEP + TASK_LOWER;
-			THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + TASK_LOWER;
 
+		for(task_i = 0 ; TASK_UPPER <=  UPPER - TASK_STEP; task_i++)
+		{
+			TASK_LOWER = (double)task_i * TASK_STEP + LOWER;
+			TASK_UPPER = (double)(task_i + 1) * TASK_STEP + LOWER;
+			THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
+			THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
+			prev = Z(THREAD_LOWER,4);
 			for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP)
 			{
 				double zout=Z(t,4);
-				if( (zout * prev) <0.0 ){
-					//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-					count++;
-				}
+				count += (signbit(zout) != signbit(prev));
 				prev=zout;
 			}
 		}
-		THREAD_STEP = (UPPER - TASK_UPPER)/nb_thread;
-		THREAD_LOWER = (double)th_id*THREAD_STEP + TASK_UPPER;
-		THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + TASK_UPPER;
-		prev=0.0;
+		TASK_STEP = (UPPER - TASK_UPPER)/nb_thread;
+		THREAD_STEP = (TASK_STEP)/nb_thread;
+		TASK_LOWER = (double)task_i * TASK_STEP + LOWER;
+		TASK_UPPER = (double)(task_i + 1) * TASK_STEP + LOWER;
+		THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
+		THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
+		prev = Z(THREAD_LOWER,4);
 		for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP)
 		{
 			double zout=Z(t,4);
-			if( (zout * prev) <0.0 ){
-				//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-				count++;
-			}
+			count += (signbit(zout) != signbit(prev));
 			prev=zout;
 		}
 	}
