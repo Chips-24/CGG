@@ -449,28 +449,3 @@ int main(int argc,char **argv)
 }
 
 
-// changer le <= en <
-
-
-/*
-const double task_step = (UPPER-LOWER)/(nb_thread*16);
-const double thread_step = (task_step)/nb_thread;
-ui64 task_i = 0;
-ui64 thread_i = 0;
-double TASK_LOWER = 0;
-double TASK_UPPER = 0;
-double thread_lower = 0;
-double thread_upper = 0;
-
-for(task_step <LOWER UPPER)
-{
-	double TASK_LOWER = task_step * task_i;
-double TASK_UPPER = task_step * (task_i + 1);
-double thread_lower = (double)th_id*THREAD_STEP + LOWER;
-double thread_upper = (double)(th_id+1)*THREAD_STEP + LOWER;
-	for(thread_lower; thread_upper ;STEP)
-	{
-
-	}
-}
-*/
