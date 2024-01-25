@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=map_report
-#SBATCH --output=map_report_%J.o
-#SBATCH --error=map_report_%J.e
+#SBATCH --output=slurm/map_report_%J.o
+#SBATCH --error=slurm/map_report_%J.e
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
