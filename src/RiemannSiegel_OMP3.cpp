@@ -416,32 +416,45 @@ int main(int argc,char **argv)
 	{
 		const ui32 nb_thread = omp_get_num_threads();
 		const ui32 th_id = omp_get_thread_num();
-		double THREAD_STEP = (UPPER-LOWER)/nb_thread;
-    double THREAD_LOWER = (double)th_id*THREAD_STEP + LOWER;
-    double THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + LOWER;
+		const double TASK_STEP = (UPPER-LOWER)/(nb_thread*16);
+		double THREAD_STEP = (TASK_STEP)/nb_thread;
+		ui64 task_i = 0;
+		double TASK_LOWER = 0;
+		double TASK_UPPER = 0;
+		double THREAD_LOWER = 0;
+		double THREAD_UPPER = 0;
+		prev=0.0;
+		for(task_i = 0 ; TASK_UPPER <  UPPER - TASK_STEP; task_i++)
+		{
+			TASK_LOWER = TASK_STEP * task_i;
+			TASK_UPPER = TASK_STEP * (task_i + 1);
+			THREAD_LOWER = (double)th_id*THREAD_STEP + TASK_LOWER;
+			THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + TASK_LOWER;
 
-		for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP){
+			for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP)
+			{
 				double zout=Z(t,4);
-      	if( (zout * prev) <0.0 ){
-            //printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
-						count++;
+				if( (zout * prev) <0.0 ){
+					//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
+					count++;
 				}
 				prev=zout;
- 		}
-	}
-		/*
-	for (double t=LOWER;t<=UPPER;t+=STEP){
-		double zout=Z(t,4);
-		if(t>LOWER){
-			if(   ((zout<0.0)and(prev>0.0))
-				or((zout>0.0)and(prev<0.0))){
+			}
+		}
+		THREAD_STEP = (UPPER - TASK_UPPER)/nb_thread;
+		THREAD_LOWER = (double)th_id*THREAD_STEP + TASK_UPPER;
+		THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + TASK_UPPER;
+		prev=0.0;
+		for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP)
+		{
+			double zout=Z(t,4);
+			if( (zout * prev) <0.0 ){
 				//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
 				count++;
 			}
+			prev=zout;
 		}
-		prev=zout;
 	}
-	*/
 
 	double t2=dml_micros();
 
@@ -455,24 +468,4 @@ int main(int argc,char **argv)
 
 
 /*
-const double task_step = (UPPER-LOWER)/(nb_thread*16);
-const double thread_step = (task_step)/nb_thread;
-ui64 task_i = 0;
-ui64 thread_i = 0;
-double TASK_LOWER = 0;
-double TASK_UPPER = 0;
-double thread_lower = 0;
-double thread_upper = 0;
-
-for(task_step <LOWER UPPER)
-{
-	double TASK_LOWER = task_step * task_i;
-double TASK_UPPER = task_step * (task_i + 1);
-double thread_lower = (double)th_id*THREAD_STEP + LOWER;
-double thread_upper = (double)(th_id+1)*THREAD_STEP + LOWER;
-	for(thread_lower; thread_upper ;STEP)
-	{
-
-	}
-}
 */
