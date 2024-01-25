@@ -67,8 +67,8 @@ Compute time 1 year-core so an algortihm 10000*2*40 times more efficient than Ze
 typedef unsigned long      ui32;
 typedef unsigned long long ui64;
 
-double* invert_sqrt;
-double* log_int;
+std::vector<double> invert_sqrt;
+std::vector<double> log_int;
 
 double dml_micros()
 {
@@ -105,8 +105,8 @@ double theta(double t)
 
 void compute_table(ui64 size)
 {
-	invert_sqrt = (double*)malloc(sizeof(double)*size);
-	log_int = (double*)malloc(sizeof(double)*size);
+	invert_sqrt.reserve(size);
+	log_int.reserve(size);
 	#pragma omp parallel for
 	for (ui64 k = 1; k < size; k++)
 	{
@@ -556,7 +556,7 @@ int main(int argc,char **argv)
 	double t2=dml_micros();
 
 	printf("I found %1.0lf Zeros in %.3lf seconds\n",count,(t2-t1)/1000000.0);
-	free(log_int);
-	free(invert_sqrt);
+	log_int.clear();
+	invert_sqrt.clear();
 	return(0);
 }
