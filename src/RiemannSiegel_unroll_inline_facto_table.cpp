@@ -524,6 +524,7 @@ int main(int argc,char **argv)
 	double t2=dml_micros();
 
 	printf("I found %1.0lf Zeros in %.3lf seconds\n",count,(t2-t1)/1000000.0);
-	
+	free(log_int);
+	free(invert_sqrt);
 	return(0);
 }
