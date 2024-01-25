@@ -3,7 +3,7 @@ GNU_CC = g++
 GNUOPT = -larmpl_lp64_mp
 
 LLVM_CC = armclang++
-LLVMOPT = -armpl=parallel
+LLVMOPT = -armpl=parallel -fsimdmath
 
 # Commons flags
 CFLAGS = -Wall -mcpu=native -O3 -fopenmp -lamath
