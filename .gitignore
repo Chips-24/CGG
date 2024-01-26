@@ -6,4 +6,5 @@ output/
 test*
 run
 even.cpp
-
+*.txt
+*.obj
