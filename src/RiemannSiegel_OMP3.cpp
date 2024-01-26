@@ -347,13 +347,13 @@ double Z(double t, int n)
 	int N = (int)temp; 
 		p = temp - N; 
 	double tt = theta(t); 
-	double ZZ = 0.0; 
+	volatile double ZZ = 0.0; 
 	for (int j=1;j <= N;j++) {
 		// 1/sqrt remplacé par rsqrt ?
 		ZZ = ZZ + invert_sqrt[j] * cos(tt - t*log_int[j]);
 	} 
 	ZZ = 2.0 * ZZ; 
-	double R  = 0.0; 
+	volatile double R  = 0.0; 
 
 	/*
 	for (int k=0;k <= n;k++) {
@@ -532,17 +532,19 @@ int main(int argc,char **argv)
 			THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
 			THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
 			prev = Z(THREAD_LOWER,4);
-			for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP)
+			volatile double t = 0.0;
+			for (t =THREAD_LOWER;t<=THREAD_UPPER;t+=STEP)
 			{
 				double zout=Z(t,4);
 				count += (signbit(zout) != signbit(prev));
 				prev=zout;
 			}
 		}
+		
 		TASK_STEP = (UPPER - TASK_UPPER)/nb_thread;
 		THREAD_STEP = (TASK_STEP)/nb_thread;
-		TASK_LOWER = (double)task_i * TASK_STEP + LOWER;
-		TASK_UPPER = (double)(task_i + 1) * TASK_STEP + LOWER;
+		TASK_LOWER = TASK_UPPER;
+		TASK_UPPER = UPPER;
 		THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
 		THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
 		prev = Z(THREAD_LOWER,4);

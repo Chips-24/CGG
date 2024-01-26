@@ -520,8 +520,8 @@ int main(int argc,char **argv)
 		double THREAD_STEP = (UPPER-LOWER)/nb_thread;
     double THREAD_LOWER = (double)th_id*THREAD_STEP + LOWER;
     double THREAD_UPPER = (double)(th_id+1)*THREAD_STEP + LOWER;
-
-		for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP){
+		prev = Z(THREAD_LOWER,4);
+		for (volatile double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP){
 				double zout=Z(t,4);
       	count += (signbit(zout) != signbit(prev));
 				prev=zout;
