@@ -103,7 +103,7 @@ double theta(double t)
 	//https://oeis.org/A114721  // denominators
 }
 
-void __attribute__((optimize("O1"))) compute_table(ui64 size)
+void compute_table(ui64 size)
 {
 	invert_sqrt.reserve(size);
 	log_int.reserve(size);
