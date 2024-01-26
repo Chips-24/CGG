@@ -524,33 +524,52 @@ int main(int argc,char **argv)
 		ui64 TASK_UPPER = 0;
 		ui64 THREAD_LOWER = 0;
 		ui64 THREAD_UPPER = 0;
-		for(task_i = 0 ; task_i <  nb_thread ; task_i++)
-		{
-			TASK_LOWER = (double)task_i * TASK_STEP;
-			TASK_UPPER = (double)(task_i + 1) * TASK_STEP;
-			THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
-			THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
-			prev = Z(THREAD_LOWER*STEP + LOWER, 4);
-			volatile ui64 t = 0.0;
-			for (t = THREAD_LOWER; t <= THREAD_UPPER; t++)
-			{
-				//printf("%d %f\n",t ,LOWER+STEP*t);
-				double zout=Z(STEP*t + LOWER,4);
-				count += (signbit(zout) != signbit(prev));
-				prev=zout;
-			}
-		}
 		
-		TASK_STEP = NUMSAMPLES - TASK_UPPER;
-		volatile ui64 t = 0.0;
-		//printf("Las thread num sample %d \n", NUMSAMPLES - TASK_UPPER);
-		prev = Z(THREAD_UPPER*STEP + LOWER,4);
 		if(th_id == nb_thread - 1)
 		{
-			for ( t = THREAD_UPPER; t <= NUMSAMPLES; t++)
+			for(task_i = 0 ; task_i <  nb_thread ; task_i++)
 			{
-				double zout=Z(LOWER+STEP*t,4);
-				//printf("%d %f\n",t ,LOWER+STEP*t);
+				TASK_LOWER = (double)task_i * TASK_STEP;
+				TASK_UPPER = (double)(task_i + 1) * TASK_STEP;
+				THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
+				prev = Z(THREAD_LOWER*STEP + LOWER, 4);
+				volatile ui64 t = 0.0;
+				for (t = THREAD_LOWER; t < TASK_UPPER; t++)
+				{
+					//printf("%d %f\n",t ,LOWER+STEP*t);
+					double zout=Z(STEP*t + LOWER,4);
+					count += (signbit(zout) != signbit(prev));
+					prev=zout;
+				}
+			}
+		}
+		else
+		{
+			for(task_i = 0 ; task_i <  nb_thread ; task_i++)
+			{
+				TASK_LOWER = (double)task_i * TASK_STEP;
+				TASK_UPPER = (double)(task_i + 1) * TASK_STEP;
+				THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
+				THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
+				prev = Z(THREAD_LOWER*STEP + LOWER, 4);
+				volatile ui64 t = 0.0;
+				for (t = THREAD_LOWER; t < THREAD_UPPER; t++)
+				{
+					//printf("%d %f\n",t ,LOWER+STEP*t);
+					double zout=Z(STEP*t + LOWER,4);
+					count += (signbit(zout) != signbit(prev));
+					prev=zout;
+				}
+			}
+		}
+		volatile ui64 t = 0.0;
+		//printf("Last thread num sample %d \n", NUMSAMPLES - TASK_UPPER);
+		prev = Z(TASK_UPPER*STEP + LOWER,4);
+		if(th_id == nb_thread - 1)
+		{
+			for ( t = TASK_UPPER; t < NUMSAMPLES; t++)
+			{
+				double zout = Z(LOWER+STEP*t,4);
 				count += (signbit(zout) != signbit(prev));
 				prev=zout;
 			}
