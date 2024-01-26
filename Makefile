@@ -1,12 +1,12 @@
 # Compiler informations
 GNU_CC = g++
-GNUOPT = -larmpl_lp64_mp -ftree-vectorize
+GNUOPT = -larmpl_lp64_mp -ftree-vectorize -funroll-loops 
 
 LLVM_CC = armclang++
-LLVMOPT = -armpl=parallel -fsimdmath
+LLVMOPT = -armpl=parallel -fsimdmath -fvectorize
 
 # Commons flags
-CFLAGS = -Wall -mcpu=native -O3 -fopenmp -lamath
+CFLAGS = -Wall -mcpu=neoverse-v1 -O3 -fopenmp -lamath
 
 # Activate debug flags
 ifdef DEBUG
