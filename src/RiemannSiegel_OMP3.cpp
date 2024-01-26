@@ -543,7 +543,7 @@ int main(int argc,char **argv)
 		
 		TASK_STEP = NUMSAMPLES - TASK_UPPER;
 		volatile ui64 t = 0.0;
-		printf("Las thread num sample %d \n", NUMSAMPLES - TASK_UPPER);
+		//printf("Las thread num sample %d \n", NUMSAMPLES - TASK_UPPER);
 		prev = Z(THREAD_UPPER*STEP + LOWER,4);
 		if(th_id == nb_thread - 1)
 		{
