@@ -517,43 +517,45 @@ int main(int argc,char **argv)
 	{
 		const ui32 nb_thread = omp_get_num_threads();
 		const ui32 th_id = omp_get_thread_num();
-		double TASK_STEP = (UPPER-LOWER)/nb_thread;
-		double THREAD_STEP = (TASK_STEP)/nb_thread;
+		ui64 TASK_STEP = floor(NUMSAMPLES/nb_thread);
+		ui64 THREAD_STEP = floor(TASK_STEP/nb_thread);
 		ui64 task_i = 0;
-		double TASK_LOWER = 0;
-		double TASK_UPPER = 0;
-		double THREAD_LOWER = 0;
-		double THREAD_UPPER = 0;
-
-		for(task_i = 0 ; TASK_UPPER <=  UPPER - TASK_STEP; task_i++)
+		ui64 TASK_LOWER = 0;
+		ui64 TASK_UPPER = 0;
+		ui64 THREAD_LOWER = 0;
+		ui64 THREAD_UPPER = 0;
+		for(task_i = 0 ; task_i <  nb_thread ; task_i++)
 		{
-			TASK_LOWER = (double)task_i * TASK_STEP + LOWER;
-			TASK_UPPER = (double)(task_i + 1) * TASK_STEP + LOWER;
+			TASK_LOWER = (double)task_i * TASK_STEP;
+			TASK_UPPER = (double)(task_i + 1) * TASK_STEP;
 			THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
 			THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
-			prev = Z(THREAD_LOWER,4);
-			volatile double t = 0.0;
-			for (t =THREAD_LOWER;t<=THREAD_UPPER;t+=STEP)
+			prev = Z(THREAD_LOWER*STEP + LOWER, 4);
+			volatile ui64 t = 0.0;
+			for (t = THREAD_LOWER; t <= THREAD_UPPER; t++)
 			{
-				double zout=Z(t,4);
+				//printf("%d %f\n",t ,LOWER+STEP*t);
+				double zout=Z(STEP*t + LOWER,4);
 				count += (signbit(zout) != signbit(prev));
 				prev=zout;
 			}
 		}
 		
-		TASK_STEP = (UPPER - TASK_UPPER)/nb_thread;
-		THREAD_STEP = (TASK_STEP)/nb_thread;
-		TASK_LOWER = TASK_UPPER;
-		TASK_UPPER = UPPER;
-		THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
-		THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
-		prev = Z(THREAD_LOWER,4);
-		for (double t=THREAD_LOWER;t<=THREAD_UPPER;t+=STEP)
+		TASK_STEP = NUMSAMPLES - TASK_UPPER;
+		volatile ui64 t = 0.0;
+		printf("Las thread num sample %d \n", NUMSAMPLES - TASK_UPPER);
+		prev = Z(THREAD_UPPER*STEP + LOWER,4);
+		if(th_id == nb_thread - 1)
 		{
-			double zout=Z(t,4);
-			count += (signbit(zout) != signbit(prev));
-			prev=zout;
+			for ( t = THREAD_UPPER; t <= NUMSAMPLES; t++)
+			{
+				double zout=Z(LOWER+STEP*t,4);
+				//printf("%d %f\n",t ,LOWER+STEP*t);
+				count += (signbit(zout) != signbit(prev));
+				prev=zout;
+			}
 		}
+		
 	}
 
 	double t2=dml_micros();
