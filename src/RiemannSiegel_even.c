@@ -2,12 +2,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <sys/time.h>
-#include <iostream>
-#include <iomanip>
-#include <cmath>
-#include <complex>
-#include <vector>
-#include <cassert>
 
 /*************************************************************************
 * *
@@ -73,10 +67,9 @@ double dml_micros()
         return((tv.tv_sec*1000000.0)+tv.tv_usec);
 }
 
-int even(int n)
+inline __attribute__((always_inline)) int even(int n)
 {
-	if (n%2 == 0) return(1);
-	else          return(-1);
+	return 1-2*(n&1);
 }
 
 double theta(double t)
@@ -239,142 +232,45 @@ double Z(double t, int n)
 	return(ZZ + R);
 }
 
-/*
-	Code to compute Zeta(t) with high precision
-	Only works in IEEE 754 for t<1000
-	This can help to validate that the Riemann Siegel function for small values but since we are mainly interrested to the behavior for large values of t,
-	the best method is to compute zeros that are known
-	As you may observe, the accuracy of Z(t) gets better with large values of t until being limited by the IEEE 754 norm and the double format. 
-*/
-std::complex <double> test_zerod(const double zero,const int N)
-{
-        std::complex <double> un(1.0,0);  
-        std::complex <double> deux(2.0,0); 
-        std::complex <double> c1(0.5,zero);
-        std::complex <double> sum1(0.0,0.0);
-        std::complex <double> sum2(0.0,0.0);
-        std::complex <double> p1=un/(un-pow(deux,un-c1));
-
-        for(int k=1;k<=N;k++){
-                 std::complex <double> p2=un/pow(k,c1);
-                 if(k%2==0)sum1+=p2;
-                 if(k%2==1)sum1-=p2;
-        }
-        std::vector<double   > V1(N);
-        std::vector<double   > V2(N);
-        double coef=1.0;
-        double up=N;
-        double dw=1.0;
-        double su=0.0;
-        for(int k=0;k<N;k++){
-                coef*=up;up-=1.0;
-                coef/=dw;dw+=1.0;
-                V1[k]=coef;
-                su+=coef;
-        }
-        for(int k=0;k<N;k++){
-                V2[k]=su;
-                su-=V1[k];
-        }
-        for(int k=N+1;k<=2*N;k++){
-                 std::complex <double> p2=un/pow(k,c1);
-                 double ek=V2[k-N-1];
-                 std::complex <double> c3(ek,0.0);
-                 std::complex <double> c4=p2*c3;
-                 if(k%2==0)sum2+=c4;
-                 if(k%2==1)sum2-=c4;
-        }
-
-        std::complex <double> rez=(sum1+sum2/pow(deux,N))*p1;
-        return(rez);
-}
-
-void test_one_zero(double t)
-{
-	double RS=Z(t,4);
-	std::complex <double> c1=test_zerod(t,10);
-	std::complex <double> c2=test_zerod(t,100);
-	std::complex <double> c3=test_zerod(t,1000);
-	std::cout << std::setprecision(15);
-        std::cout << "RS= "<<" "<<RS<<" TEST10= "<< c1 << " TEST100=" << c2 << " TEST1000=" << c3 << std::endl;
-	
-}
-
-void tests_zeros()
-{
-	test_one_zero(14.1347251417346937904572519835625);
-        test_one_zero(101.3178510057313912287854479402924);
-        test_one_zero(1001.3494826377827371221033096531063);
-        test_one_zero(10000.0653454145353147502287213889928);
-
-}
-
-/*
-	An option to better the performance of Z(t) for large values of t is to simplify the equations
-	to validate we present a function that tests the known zeros :  look at https://www.lmfdb.org/zeros/zeta/?limit=10&N=10
-	We should obtain 0.0
-        no need to test many zeros. In case of a bug the column 2 will show large values instead of values close to 0 like with the original code
-	Observe that when t increases the accuracy increases until the limits of the IEEE 754 norm block us, we should work with extended precision
-	But here a few digits of precision are enough to count the zeros, only on rare cases the _float128 should be used
-	But this limitation only appears very far and with the constraint of resources it won't be possible to reach this region. 
-	----------------------------------------------------------------------------------------------------------------------
-	value in double			should be 0.0		 value in strings: LMFDB all the digits are corrects
-        14.13472514173469463117        -0.00000248590756340983   14.1347251417346937904572519835625
-        21.02203963877155601381        -0.00000294582959536882   21.0220396387715549926284795938969
-        25.01085758014568938279        -0.00000174024500421144   25.0108575801456887632137909925628
-       178.37740777609997167019         0.00000000389177887139   178.3774077760999772858309354141843
-       179.91648402025700193008         0.00000000315651035865   179.9164840202569961393400366120511
-       182.20707848436646258961         0.00000000214091858131   182.207078484366461915407037226988
- 371870901.89642333984375000000         0.00000060389888876036   371870901.8964233245801283081720385309201
- 371870902.28132432699203491211        -0.00000083698274928878   371870902.2813243157291041227177012243450
- 371870902.52132433652877807617        -0.00000046459056067712   371870902.5213243412580878836297930128983
-*/
-
-char line[1024];
-void test_fileof_zeros(const char *fname)
-{
-	FILE *fi=fopen(fname,"r");
-	assert(fi!=NULL);
-	for(;;){
-		double t,RS;
-		fgets(line,1000,fi);
-		if(feof(fi))break;
-		sscanf(line,"%lf",&t);
-		RS=Z(t,4);
-		printf(" %30.20lf %30.20lf   %s",t,RS,line);
-
-	}
-	fclose(fi);
-}
-
 int main(int argc,char **argv)
 {
 	double LOWER,UPPER,SAMP;
 	const double pi = 3.1415926535897932385;
-	//tests_zeros();
-	//test_fileof_zeros("ZEROS");
-	try {
-		LOWER=std::atof(argv[1]);
-		UPPER=std::atof(argv[2]);
-		SAMP =std::atof(argv[3]);
+	
+	if(argc!=4){
+		printf("usage : %s LOWER UPPER SAMP\n",argv[0]);
+		exit(0);
 	}
-	catch (...) {
-				std::cout << argv[0] << " START END SAMPLING" << std::endl;
-				return -1;
-		}
+	LOWER=atof(argv[1]);
+	UPPER=atof(argv[2]);
+	SAMP=atof(argv[3]);
+	if (LOWER<0.0 || UPPER<0.0){
+		printf("LOWER and UPPER must be positive\n");
+		exit(0);
+	}
+	if (LOWER>UPPER){
+		printf("LOWER must be lower than UPPER\n");
+		exit(0);
+	}
+	if (SAMP<1.0){
+		printf("SAMP must be superior or equal to 1.0\n");
+		exit(0);
+	}
+
+
 	double estimate_zeros=theta(UPPER)/pi;
 	printf("I estimate I will find %1.3lf zeros\n",estimate_zeros);
 
 	double STEP = 1.0/SAMP;
-	ui64   NUMSAMPLES=floor((UPPER-LOWER)*SAMP+1.0);
+	// ui64   NUMSAMPLES=floor((UPPER-LOWER)*SAMP+1.0);
 	double prev=0.0;
 	double count=0.0;
 	double t1=dml_micros();
 	for (double t=LOWER;t<=UPPER;t+=STEP){
 		double zout=Z(t,4);
 		if(t>LOWER){
-			if(   ((zout<0.0)and(prev>0.0))
-				or((zout>0.0)and(prev<0.0))){
+			if(   ((zout<0.0)&&(prev>0.0))
+				||((zout>0.0)&&(prev<0.0))){
 				//printf("%20.6lf  %20.12lf %20.12lf\n",t,prev,zout);
 				count++;
 			}
