@@ -105,8 +105,8 @@ double theta(double t)
 
 void __attribute__((optimize("O1"))) compute_table(ui64 size)
 {
-	invert_sqrt.reserve(size);
-	log_int.reserve(size);
+	invert_sqrt.resize(size);
+	log_int.resize(size);
 	#pragma omp parallel for shared(invert_sqrt,log_int)
 	for (ui64 k = 1; k < size; k++)
 	{
@@ -347,13 +347,13 @@ double Z(double t, int n)
 	int N = (int)temp; 
 		p = temp - N; 
 	double tt = theta(t); 
-	volatile double ZZ = 0.0; 
+	double ZZ = 0.0; 
 	for (int j=1;j <= N;j++) {
 		// 1/sqrt remplacé par rsqrt ?
 		ZZ = ZZ + invert_sqrt[j] * cos(tt - t*log_int[j]);
 	} 
 	ZZ = 2.0 * ZZ; 
-	volatile double R  = 0.0; 
+	double R  = 0.0; 
 
 	/*
 	for (int k=0;k <= n;k++) {
@@ -534,7 +534,7 @@ int main(int argc,char **argv)
 				THREAD_LOWER = (double)th_id * THREAD_STEP + TASK_LOWER;
 				prev = Z(THREAD_LOWER*STEP + LOWER, 4);
 				volatile ui64 t = 0.0;
-				for (t = THREAD_LOWER; t < TASK_UPPER; t++)
+				for (t = THREAD_LOWER; t <= TASK_UPPER; t++)
 				{
 					//printf("%d %f\n",t ,LOWER+STEP*t);
 					double zout=Z(STEP*t + LOWER,4);
@@ -553,7 +553,7 @@ int main(int argc,char **argv)
 				THREAD_UPPER = (double)(th_id + 1) * THREAD_STEP + TASK_LOWER;
 				prev = Z(THREAD_LOWER*STEP + LOWER, 4);
 				volatile ui64 t = 0.0;
-				for (t = THREAD_LOWER; t < THREAD_UPPER; t++)
+				for (t = THREAD_LOWER; t <= THREAD_UPPER; t++)
 				{
 					//printf("%d %f\n",t ,LOWER+STEP*t);
 					double zout=Z(STEP*t + LOWER,4);
@@ -584,3 +584,4 @@ int main(int argc,char **argv)
 	invert_sqrt.clear();
 	return(0);
 }
+
