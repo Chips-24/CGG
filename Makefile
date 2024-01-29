@@ -22,7 +22,7 @@ ifdef ARM
 	CFLAGS+= -DARM -lamath
 	GNUCXXFLAGS+= -larmpl_lp64_mp 
 	LLVMCXX= armclang++
-	LLVMCXXFLAGS+= -armpl=parallel -mcpu=neoverse-v2 -fsimdmath
+	LLVMCXXFLAGS+= -armpl=parallel -mcpu=neoverse-v2
 	GNUCCFLAGS+= -larmpl_lp64_mp
 endif
 

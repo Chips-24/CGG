@@ -122,6 +122,7 @@ for ((i = 0; i < ${#COMPILERS_ORDER[@]}; i++)); do
             tmp=${COMPILERS_ORDER[$i]}
             COMPILERS_ORDER[$i]=${COMPILERS_ORDER[$j]}
             COMPILERS_ORDER[$j]=$tmp
+            keyi=${BINARIES_ORDER[$i]}
         fi
     done
 done

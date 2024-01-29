@@ -112,6 +112,7 @@ for ((i = 0; i < ${#BINARIES_ORDER[@]}; i++)); do
             tmp=${BINARIES_ORDER[$i]}
             BINARIES_ORDER[$i]=${BINARIES_ORDER[$j]}
             BINARIES_ORDER[$j]=$tmp
+            keyi=${BINARIES_ORDER[$i]}
         fi
     done
 done
