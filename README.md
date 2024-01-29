@@ -11,6 +11,9 @@ make ARM=1   // pour compiler avec gcc g++ et armclang++  et activer les flags e
 Ajouter DEBUG=1 pour avoir les symboles de debug (-g3)
 ```
 
+Le code originel est dans `RiemannSiegel_Original.cpp`  
+Le code le plus avancé est `RiemannSiegel_unpow_unroll_inline_arm_noif_table_nofmod_OMP.c`  
+
 Pour lancer un programme vite fait avec slurm :
 ```
 ./quick.sbatch <prog> [args ...]
@@ -56,4 +59,3 @@ Same behaviour as compare_versions.sh
 ```
 This one will run the two given files with the given parameters.  
 Same behaviour as compare_versions.sh  
-
